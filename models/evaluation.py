@@ -68,7 +68,7 @@ def evaluate_QA(QA_results):
     count = 0
     for sample in QA_results:
         gold_answer = sample['answer'].replace('(', '').replace(')', '').strip()
-        answer_str = sample['predicted_answer'].strip() if sample['predicted_answer'] is not None else ''
+        answer_str = sample.get('predicted_answer', '').strip()
         prediction = get_choice(answer_str)
 
         indicators = ['the correct option is', 'the correct answer is', 
@@ -97,7 +97,7 @@ def full_evaluation(result_file):
     with open(result_file, 'r') as f:
         all_samples = json.load(f)
 
-    executable_samples = [sample for sample in all_samples if sample['flag'] == 'success']
+    executable_samples = all_samples
     print(f"Overall accuracy: {evaluate_QA(all_samples)}")
     print(f'Executable rate (Exe_Rate): {len(executable_samples)/len(all_samples)}')
     print(f"Executable accuracy (Exe_Acc): {evaluate_QA(executable_samples)}")
@@ -107,6 +107,7 @@ def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--dataset_name", type=str)
     parser.add_argument("--model_name", type=str, default='text-davinci-003')
+    parser.add_argument("--result_file", type=str, default=None)
     parser.add_argument("--split", type=str, default='dev')
     parser.add_argument("--backup", type=str, default='random')
     args = parser.parse_args()
@@ -114,7 +115,14 @@ def parse_args():
 
 if __name__ == "__main__":
     args = parse_args()
+
     result_path = f'./outputs/logic_inference'
-    result_file = os.path.join(result_path, f'{args.dataset_name}_{args.split}_{args.model_name}_backup-{args.backup}.json')
-    # evaluate_QA(result_file)
+    result_file = os.path.join(
+        result_path,
+        f'{args.dataset_name}_{args.split}_{args.model_name}_backup-{args.backup}.json'
+    )
+
+    # 👇 Hardcoded override (for now)
+    result_file = 'outputs/logic_inference/task3_test_output.json'
+
     full_evaluation(result_file)

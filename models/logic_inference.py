@@ -28,17 +28,26 @@ class LogicInferenceEngine:
         self.backup_generator = Backup_Answer_Generator(self.dataset_name, self.backup_strategy, self.args.backup_LLM_result_path)
 
     def load_logic_programs(self):
-        with open(os.path.join('./outputs/logic_programs', f'{self.dataset_name}_{self.split}_{self.model_name}.json')) as f:
+        custom_path = f'data/{self.dataset_name}/{self.split}.json'
+        if os.path.exists(custom_path):
+            path_to_load = custom_path
+        else:
+            path_to_load = os.path.join('./outputs/logic_programs', f'{self.dataset_name}_{self.split}_{self.model_name}.json')
+
+        with open(path_to_load) as f:
             dataset = json.load(f)
         print(f"Loaded {len(dataset)} examples from {self.split} split.")
         return dataset
+
     
     def save_results(self, outputs):
-        if not os.path.exists(self.save_path):
-            os.makedirs(self.save_path)
-        
-        with open(os.path.join(self.save_path, f'{self.dataset_name}_{self.split}_{self.model_name}_backup-{self.backup_strategy}.json'), 'w') as f:
+        # Ensure parent directory exists
+        os.makedirs(os.path.dirname(self.save_path), exist_ok=True)
+
+        # Save directly to the file path
+        with open(self.save_path, 'w') as f:
             json.dump(outputs, f, indent=2, ensure_ascii=False)
+
 
     def safe_execute_program(self, id, logic_program):
         program = self.program_executor(logic_program, self.dataset_name)

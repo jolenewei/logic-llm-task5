@@ -1,0 +1,12 @@
+[
+  {
+    "id": "task3_test_001",
+    "context": "Alice is kind. Kind people are helpful.",
+    "question": "Is Alice helpful?",
+    "answer": "A",
+    "options": ["A) True", "B) False", "C) Unknown"],
+    "raw_logic_programs": [
+      "Predicates:\nKind($x, bool) ::: Is x kind?\nHelpful($x, bool) ::: Is x helpful?\nFacts:\nKind(Alice, True) ::: Alice is kind.\nRules:\nKind($x, True) >>> Helpful($x, True) ::: Kind people are helpful.\nQuery:\nHelpful(Alice, True) ::: Is Alice helpful?"
+    ]
+  }
+]
